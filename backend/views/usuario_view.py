@@ -1,5 +1,5 @@
 from flask_restx import Namespace, Resource, fields
-from services.usuario_service import criar_usuario, listar_usuarios, localizar_usuario, excluir_usuario, atualizar_usuario
+from services.usuario_service import *
 
 # Definindo o namespace
 usuario_ns = Namespace('usuarios', description='Operações relacionadas a usuários')
