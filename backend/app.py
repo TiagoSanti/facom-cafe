@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_cors import CORS
 from flask_restx import Api
 from models import db
 from views.assinatura_view import assinatura_ns
@@ -14,6 +15,9 @@ from views.usuario_view import usuario_ns
 app = Flask(__name__)
 app.config.from_object('config.Config')
 db.init_app(app)
+
+CORS(app)
+CORS(app, resources={r'/*': {'origins': '*'}})
 
 api = Api(app,
           version='1.0',
