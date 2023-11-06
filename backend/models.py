@@ -49,8 +49,8 @@ class Assinatura(db.Model):
             'id': self.id,
             'id_usuario': self.id_usuario,
             'id_plano': self.id_plano,
-            'data_de_inicio': self.data_de_inicio,
-            'data_de_termino': self.data_de_termino,
+            'data_de_inicio': self.data_de_inicio.isoformat(),
+            'data_de_termino': self.data_de_termino.isoformat(),
             'status': self.status,
         }
 
@@ -69,7 +69,7 @@ class Pagamento(db.Model):
             'id_usuario': self.id_usuario,
             'id_assinatura': self.id_assinatura,
             'valor': self.valor,
-            'data': self.data,
+            'data': self.data.isoformat(),
             'metodo': self.metodo,
         }
     
@@ -84,7 +84,7 @@ class Pedido(db.Model):
         return {
             'id': self.id,
             'id_usuario': self.id_usuario,
-            'data': self.data,
+            'data': self.data.isoformat(),
             'status': self.status,
         }
 
@@ -151,5 +151,5 @@ class Log(db.Model):
             'tabela_modificada': self.tabela_modificada,
             'id_registro_modificado': self.id_registro_modificado,
             'operacao': self.operacao,
-            'data_hora_operacao': self.data_hora_operacao,
+            'data_hora_operacao': self.data_hora_operacao.isoformat(),
         }
