@@ -89,7 +89,7 @@ CREATE TABLE Log (
 );
 
 -- Função para capturar inserções, atualizações e exclusões e registrar na tabela Log
-CREATE OR REPLACE FUNCTION register_log() 
+CREATE OR REPLACE FUNCTION registra_log() 
 RETURNS TRIGGER AS $$
 BEGIN
     IF (TG_OP = 'INSERT' OR TG_OP = 'UPDATE') THEN
@@ -113,40 +113,66 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+
 -- Triggers para registrar alterações nas tabelas específicas
 
-CREATE TRIGGER usuario_after_change
+CREATE TRIGGER usuario_alteracao_trigger
 AFTER INSERT OR UPDATE OR DELETE ON Usuario
-FOR EACH ROW EXECUTE FUNCTION register_log();
+FOR EACH ROW EXECUTE FUNCTION registra_log();
 
-CREATE TRIGGER produto_after_change
+CREATE TRIGGER produto_alteracao_trigger
 AFTER INSERT OR UPDATE OR DELETE ON Produto
-FOR EACH ROW EXECUTE FUNCTION register_log();
+FOR EACH ROW EXECUTE FUNCTION registra_log();
 
-CREATE TRIGGER pedido_after_change
+CREATE TRIGGER pedido_alterao_trigger
 AFTER INSERT OR UPDATE OR DELETE ON Pedido
-FOR EACH ROW EXECUTE FUNCTION register_log();
+FOR EACH ROW EXECUTE FUNCTION registra_log();
 
-CREATE TRIGGER plano_after_change
+CREATE TRIGGER plano_alteraao_trigger
 AFTER INSERT OR UPDATE OR DELETE ON Plano
-FOR EACH ROW EXECUTE FUNCTION register_log();
+FOR EACH ROW EXECUTE FUNCTION registra_log();
 
-CREATE TRIGGER assinatura_after_change
+CREATE TRIGGER assinatura_alteracao_trigger
 AFTER INSERT OR UPDATE OR DELETE ON Assinatura
-FOR EACH ROW EXECUTE FUNCTION register_log();
+FOR EACH ROW EXECUTE FUNCTION registra_log();
 
-CREATE TRIGGER pagamento_after_change
+CREATE TRIGGER pagamento_alteracao_trigger
 AFTER INSERT OR UPDATE OR DELETE ON Pagamento
-FOR EACH ROW EXECUTE FUNCTION register_log();
+FOR EACH ROW EXECUTE FUNCTION registra_log();
 
-CREATE TRIGGER configuracoes_notificacao_after_change
+CREATE TRIGGER configuracoes_notificacao_alteracao_trigger
 AFTER INSERT OR UPDATE OR DELETE ON ConfiguracoesNotificacao
-FOR EACH ROW EXECUTE FUNCTION register_log();
+FOR EACH ROW EXECUTE FUNCTION registra_log();
 
-CREATE TRIGGER pedido_produto_after_change
+CREATE TRIGGER pedido_produto_alteracao_trigger
 AFTER INSERT OR UPDATE OR DELETE ON PedidoProduto
-FOR EACH ROW EXECUTE FUNCTION register_log();
+FOR EACH ROW EXECUTE FUNCTION registra_log();
 
-CREATE TRIGGER log_after_change
-AFTER INSERT OR UPDATE OR DELETE ON Log
-FOR EACH ROW EXECUTE FUNCTION register_log();
+CREATE TRIGGER log_alteracao_trigger
+AFTER UPDATE OR DELETE ON Log
+FOR EACH ROW EXECUTE FUNCTION registra_log();
+
+
+-- Criação da função que insere as configurações de notificação padrão
+CREATE OR REPLACE FUNCTION adiciona_configuracoes_de_notificacao_padrao()
+RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO ConfiguracoesNotificacao (id_usuario, receber_email, receber_sms, frequencia)
+  VALUES (NEW.id, TRUE, TRUE, 'diário');
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Criação do gatilho após inserção na tabela Usuario
+CREATE TRIGGER adiciona_configuracoes_de_notificacao_padrao_trigger
+AFTER INSERT ON Usuario
+FOR EACH ROW
+EXECUTE FUNCTION adiciona_configuracoes_de_notificacao_padrao();
+
+-- Inserindo dados na tabela Usuario
+INSERT INTO Usuario (nome, email, telefone, senha) VALUES 
+('João Silva', 'joao.silva@email.com', '1234-5678', 'senha123'),
+('Maria Oliveira', 'maria.oliveira@email.com', '2345-6789', 'senha123'),
+('Carlos Pereira', 'carlos.pereira@email.com', '3456-7890', 'senha123'),
+('Ana Santos', 'ana.santos@email.com', '4567-8901', 'senha123'),
+('Pedro Costa', 'pedro.costa@email.com', '5678-9012', 'senha123');
