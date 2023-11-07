@@ -22,7 +22,7 @@ class Plano(db.Model):
     nome = db.Column(db.String(255), nullable=False)
     descricao = db.Column(db.Text, nullable=True)
     preco = db.Column(db.Numeric, nullable=False)
-    duracao = db.Column(db.String, nullable=False)
+    duracao = db.Column(db.String(10), nullable=False)
 
     def to_dict(self):
         return {
