@@ -1,4 +1,4 @@
-from models import db, ConfiguracoesNotificacao
+from ..models import db, ConfiguracoesNotificacao
 
 def criar_configuracoes_notificacao(id_usuario, receber_email=True, receber_sms=True, frequencia='diário'):
     configuracoes_notificacao = ConfiguracoesNotificacao(id_usuario=id_usuario, receber_email=receber_email, receber_sms=receber_sms, frequencia=frequencia)

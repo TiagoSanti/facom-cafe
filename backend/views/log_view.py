@@ -1,5 +1,5 @@
 from flask_restx import Namespace, Resource, fields
-from services.log_service import *
+from ..services.log_service import *
 
 # Definindo o namespace
 log_ns = Namespace('log', description='Operações relacionadas a logs')

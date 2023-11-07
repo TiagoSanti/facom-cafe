@@ -1,5 +1,5 @@
 from flask_restx import Namespace, Resource, fields
-from services.pedido_produto_service import *
+from ..services.pedido_produto_service import *
 
 # Definindo o namespace
 pedido_produto_ns = Namespace('pedidos_produtos', description='Operações relacionadas a pedidos de produtos')

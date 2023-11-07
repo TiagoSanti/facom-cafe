@@ -1,5 +1,5 @@
 from flask_restx import Namespace, Resource, fields
-from services.assinatura_service import *
+from ..services.assinatura_service import *
 
 # Definindo o namespace
 assinatura_ns = Namespace('assinaturas', description='Operações relacionadas a assinaturas')

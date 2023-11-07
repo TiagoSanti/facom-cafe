@@ -1,5 +1,5 @@
 from flask_restx import Namespace, Resource, fields
-from services.plano_service import *
+from ..services.plano_service import *
 
 # Definindo o namespace
 plano_ns = Namespace('planos', description='Operações relacionadas a planos')

@@ -1,4 +1,4 @@
-from models import db, Assinatura
+from ..models import db, Assinatura
 
 def criar_assinatura(id_usuario, id_plano, data_inicio, data_fim):
     assinatura = Assinatura(id_usuario=id_usuario, id_plano=id_plano, data_inicio=data_inicio, data_fim=data_fim, status='ativa')

@@ -1,4 +1,4 @@
-from models import db, Usuario
+from ..models import db, Usuario
 
 def criar_usuario(nome, email, telefone, senha):
     usuario = Usuario(nome=nome, email=email, telefone=telefone, senha=senha)

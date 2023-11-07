@@ -1,4 +1,4 @@
-from models import db, PedidoProduto
+from ..models import db, PedidoProduto
 
 def criar_pedido_produto(id_pedido, id_produto, quantidade, valor):
     pedido_produto = PedidoProduto(id_pedido=id_pedido, id_produto=id_produto, quantidade=quantidade, valor=valor)

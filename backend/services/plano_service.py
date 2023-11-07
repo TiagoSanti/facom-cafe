@@ -1,4 +1,4 @@
-from models import db, Plano
+from ..models import db, Plano
 
 def criar_plano(nome, descricao, preco, duracao):
     plano = Plano(nome=nome, descricao=descricao, preco=preco, duracao=duracao)

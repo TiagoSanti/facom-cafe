@@ -1,4 +1,4 @@
-from models import db, Pedido
+from ..models import db, Pedido
 
 def criar_pedido(id_usuario, data):
     pedido = Pedido(id_usuario=id_usuario, data=data, status='pendente')

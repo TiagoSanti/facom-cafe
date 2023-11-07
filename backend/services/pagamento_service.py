@@ -1,4 +1,4 @@
-from models import db, Pagamento
+from ..models import db, Pagamento
 
 def criar_pagamento(id_usuario, id_plano, data, valor):
     pagamento = Pagamento(id_usuario=id_usuario, id_plano=id_plano, data=data, valor=valor)

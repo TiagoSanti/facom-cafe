@@ -1,5 +1,5 @@
 from flask_restx import Namespace, Resource, fields
-from services.configuracoes_notificacao_service import *
+from ..services.configuracoes_notificacao_service import *
 
 # Definindo o namespace
 configuracoes_notificacao_ns = Namespace('configuracoes_notificacao', description='Operações relacionadas a configurações de notificação')

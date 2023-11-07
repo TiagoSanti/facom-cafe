@@ -1,4 +1,4 @@
-from models import db, Produto
+from ..models import db, Produto
 
 def criar_produto(nome, preco, qtd_estoque, descricao):
     produto = Produto(nome=nome, preco=preco, qtd_estoque=qtd_estoque, descricao=descricao)
