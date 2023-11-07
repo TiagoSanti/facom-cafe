@@ -29,7 +29,7 @@ class Plano(db.Model):
             'id': self.id,
             'nome': self.nome,
             'descricao': self.descricao,
-            'preco': self.preco,
+            'preco': float(self.preco),
             'duracao': self.duracao,
         }
 
@@ -48,7 +48,7 @@ class Assinatura(db.Model):
             'id_usuario': self.id_usuario,
             'id_plano': self.id_plano,
             'data_de_inicio': self.data_de_inicio.isoformat(),
-            'data_de_termino': self.data_de_termino.isoformat(),
+            'data_de_termino': self.data_de_termino.isoformat() if self.data_de_termino else None,
             'status': self.status,
         }
 
@@ -66,7 +66,7 @@ class Pagamento(db.Model):
             'id': self.id,
             'id_usuario': self.id_usuario,
             'id_assinatura': self.id_assinatura,
-            'valor': self.valor,
+            'valor': float(self.valor),
             'data': self.data.isoformat(),
             'metodo': self.metodo,
         }
@@ -98,7 +98,7 @@ class Produto(db.Model):
         return {
             'id': self.id,
             'nome': self.nome,
-            'preco': self.preco,
+            'preco': float(self.preco),
             'qtd_estoque': self.qtd_estoque,
             'descricao': self.descricao,
         }
@@ -115,7 +115,7 @@ class PedidoProduto(db.Model):
             'id_pedido': self.id_pedido,
             'id_produto': self.id_produto,
             'quantidade': self.quantidade,
-            'valor': self.valor,
+            'valor': float(self.valor),
         }
 
 class ConfiguracoesNotificacao(db.Model):
