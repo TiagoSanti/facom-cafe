@@ -16,12 +16,12 @@ CREATE TABLE Plano (
     id SERIAL PRIMARY KEY,
     nome VARCHAR(255) NOT NULL,
     descricao TEXT,
-    preco MONEY NOT NULL,
-    duracao INTERVAL CHECK (
-        duracao = INTERVAL '1 month' OR
-        duracao = INTERVAL '3 months' OR
-        duracao = INTERVAL '6 months' OR
-        duracao = INTERVAL '1 year')
+    preco DECIMAL NOT NULL,
+    duracao VARCHAR(10) CHECK (
+        duracao = '1 mês' OR
+        duracao = '3 meses' OR
+        duracao = '6 meses' OR
+        duracao = '12 meses')
 );
 
 -- Criação da tabela Assinatura
@@ -39,7 +39,7 @@ CREATE TABLE Pagamento (
     id SERIAL PRIMARY KEY,
     id_usuario INT REFERENCES Usuario(id),
     id_assinatura INT REFERENCES Assinatura(id),
-    valor MONEY NOT NULL,
+    valor DECIMAL NOT NULL,
     data TIMESTAMP NOT NULL,
     metodo VARCHAR(7) NOT NULL CHECK (metodo IN ('débito', 'crédito', 'pix'))
 );
@@ -66,7 +66,7 @@ CREATE TABLE PedidoProduto (
     id_pedido INT REFERENCES Pedido(id),
     id_produto INT REFERENCES Produto(id),
     quantidade INT NOT NULL,
-    valor MONEY NOT NULL,
+    valor DECIMAL NOT NULL,
     PRIMARY KEY (id_pedido, id_produto)
 );
 
