@@ -9,7 +9,7 @@ plano_model = plano_ns.model('Plano', {
     'nome': fields.String(required=True, description='Nome do plano'),
     'descricao': fields.String(required=True, description='Descrição do plano'),
     'preco': fields.Float(required=True, description='Preço do plano'),
-    'duracao': fields.Integer(required=True, description='Duração do plano')
+    'duracao': fields.String(required=True, description='Duração do plano')
 })
 
 # Recurso para criar plano
