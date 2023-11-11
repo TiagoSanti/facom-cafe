@@ -1,4 +1,12 @@
-# Facom Café
+# [Facom Café](https://github.com/TiagoSanti/facom-cafe)
+
+**Grupo 4**
+
+Lourdes Oshiro Igarashi - 2021.1906.032-8
+
+Ryan Breda Santos - 2021.1906.005-0
+
+Tiago Clarintino Santi - 2021.1906.036-0
 
 ## Execução do Backend
 
@@ -52,14 +60,7 @@ Para que o backend faça a conexão com o banco de dados, é necessário criar u
 
 ```bash
 # backend/.env Exemplo de string de conexão com o banco de dados postgresql
-DATABASE_URI=postgresql://postgres:postgres@localhost/database_name
-```
-
-O nome da variável é de sua escolha, mas esse nome deve ser colocado no argumento da função os.getenv() no arquivo backend/run.py:
-
-```python
-# backend/run.py
-app = create_app(os.getenv('DATABASE_URI'))
+DATABASE_URI=postgresql://user_name:password@host:port/database_name
 ```
 
 Ao executar os passos anteriores, a API estará disponível em <http://localhost:5000/>.
