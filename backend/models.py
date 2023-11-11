@@ -1,5 +1,7 @@
-from .extensions import db
 from sqlalchemy.schema import CheckConstraint
+from flask_sqlalchemy import SQLAlchemy
+
+db = SQLAlchemy()
 
 class Usuario(db.Model):
     __tablename__ = 'usuario'
@@ -9,7 +11,6 @@ class Usuario(db.Model):
     nome = db.Column(db.String(255), nullable=False)
     email = db.Column(db.String(255), unique=True, nullable=False)
     telefone = db.Column(db.String(15), unique=True, nullable=False)
-    senha = db.Column(db.String(255), nullable=False)
 
     # Relacionamentos
     assinaturas = db.relationship('Assinatura', back_populates='usuario')
@@ -64,7 +65,6 @@ class Assinatura(db.Model):
     usuario = db.relationship('Usuario', back_populates='assinaturas')
     plano = db.relationship('Plano', back_populates='assinaturas')
     pagamentos = db.relationship('Pagamento', back_populates='assinatura')
-
 
     def to_dict(self):
         return {
@@ -173,7 +173,7 @@ class ConfiguracoesNotificacao(db.Model):
 
     # Atributos
     id = db.Column(db.Integer, primary_key=True)
-    id_usuario = db.Column(db.Integer, db.ForeignKey('usuario.id'), unique=True, nullable=False)
+    id_usuario = db.Column(db.Integer, db.ForeignKey('usuario.id'), unique=True)
     receber_email = db.Column(db.Boolean, nullable=False)
     receber_sms = db.Column(db.Boolean, nullable=False)
     frequencia = db.Column(db.String(7), nullable=False)
@@ -197,6 +197,7 @@ class Log(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     tabela_modificada = db.Column(db.String(255), nullable=False)
     id_registro_modificado = db.Column(db.Integer, nullable=False)
+    id_registro_modificado_secundario = db.Column(db.Integer, nullable=True)
     operacao = db.Column(db.String(50), nullable=False)
     data_hora_operacao = db.Column(db.DateTime, nullable=False)
 
@@ -205,8 +206,7 @@ class Log(db.Model):
             'id': self.id,
             'tabela_modificada': self.tabela_modificada,
             'id_registro_modificado': self.id_registro_modificado,
+            'id_registro_modificado_secundario': self.id_registro_modificado_secundario,
             'operacao': self.operacao,
             'data_hora_operacao': self.data_hora_operacao.isoformat(),
         }
-    
-    
