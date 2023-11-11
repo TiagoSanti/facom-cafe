@@ -6,12 +6,12 @@ log_ns = Namespace('log', description='Operações relacionadas a logs')
 
 # Modelo para documentação da API
 log_model = log_ns.model('Log', {
-    'id': fields.Integer(required=True, description='ID do log'),
-    'id_usuario': fields.Integer(required=True, description='ID do usuário'),
-    'tabela_modificada': fields.String(required=True, description='Tabela modificada'),
-    'modificacao': fields.String(required=True, description='Tipo de modificação'),
-    'data': fields.Date(required=True, description='Data da modificação'),
-    'detalhes': fields.String(required=True, description='Detalhes da modificação')
+    'id': fields.Integer(readonly=True, description='Identificador único do log'),
+    'tabela_modificada': fields.String(required=True, description='Nome da tabela modificada'),
+    'id_registro_modificado': fields.Integer(required=True, description='Identificador único do registro modificado'),
+    'id_registro_modificado_secundario': fields.Integer(required=False, description='Identificador único do registro modificado secundário'),
+    'operacao': fields.String(required=True, description='Tipo de operação realizada'),
+    'data_hora_operacao': fields.DateTime(required=True, description='Data e hora da operação')
 })
 
 # Recurso para listar logs

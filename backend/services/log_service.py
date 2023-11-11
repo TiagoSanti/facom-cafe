@@ -1,4 +1,4 @@
-from ..models import db, Log
+from ..models import Log
 
 def listar_logs():
     return Log.query.all()
