@@ -13,7 +13,7 @@ class Assinatura(db.Model):
     id_plano = db.Column(db.Integer, db.ForeignKey('plano.id'), nullable=False)
     data_de_inicio = db.Column(db.Date, nullable=False)
     data_de_termino = db.Column(db.Date, nullable=True)
-    status = db.Column(db.String(9), nullable=False) # ativa, cancelada, suspensa
+    status = db.Column(db.String(9), nullable=False)
 
     # Relacionamentos
     usuario = db.relationship('Usuario', back_populates='assinaturas')
@@ -84,7 +84,7 @@ class Pagamento(db.Model):
     id_assinatura = db.Column(db.Integer, db.ForeignKey('assinatura.id'), nullable=False)
     valor = db.Column(db.Numeric, nullable=False)
     data = db.Column(db.DateTime, nullable=False)
-    metodo = db.Column(db.String(7), nullable=False) # debito, credito, pix
+    metodo = db.Column(db.String(7), nullable=False)
 
     # Relacionamentos
     usuario = db.relationship('Usuario', back_populates='pagamentos')
@@ -108,7 +108,7 @@ class Pedido(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     id_usuario = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
     data = db.Column(db.DateTime, nullable=False)
-    status = db.Column(db.String(50), nullable=False) # concluido, cancelado, pendente
+    status = db.Column(db.String(50), nullable=False)
 
     # Relacionamentos
     usuario = db.relationship('Usuario', back_populates='pedidos')
