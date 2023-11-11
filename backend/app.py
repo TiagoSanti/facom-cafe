@@ -1,8 +1,7 @@
 from flask import Flask
 from flask_cors import CORS
 from flask_restx import Api
-from .extensions import db
-from .db_setup import create_and_populate_db
+from .models import db
 from .views.assinatura_view import assinatura_ns
 from .views.configuracoes_notificacao_view import configuracoes_notificacao_ns
 from .views.log_view import log_ns
@@ -20,7 +19,7 @@ def create_app(DB_URI):
     db.init_app(app)
 
     with app.app_context():
-        create_and_populate_db()
+        db.create_all()
 
     CORS(app)
     CORS(app, resources={r'/*': {'origins': '*'}})
