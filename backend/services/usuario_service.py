@@ -1,7 +1,7 @@
 from ..models import db, Usuario
 
-def criar_usuario(nome, email, telefone, senha):
-    usuario = Usuario(nome=nome, email=email, telefone=telefone, senha=senha)
+def criar_usuario(nome, email, telefone):
+    usuario = Usuario(nome=nome, email=email, telefone=telefone)
     db.session.add(usuario)
     db.session.commit()
     return usuario
@@ -18,11 +18,10 @@ def excluir_usuario(id):
     db.session.commit()
     return True
 
-def atualizar_usuario(id, nome, email, telefone, senha):
+def atualizar_usuario(id, nome, email, telefone):
     usuario = Usuario.query.filter_by(id=id).first()
     usuario.nome = nome
     usuario.email = email
     usuario.telefone = telefone
-    usuario.senha = senha
     db.session.commit()
     return usuario

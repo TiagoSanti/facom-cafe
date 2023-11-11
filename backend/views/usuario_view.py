@@ -8,8 +8,7 @@ usuario_ns = Namespace('usuarios', description='Operações relacionadas a usuá
 usuario_model = usuario_ns.model('Usuario', {
     'nome': fields.String(required=True, description='Nome do usuário'),
     'email': fields.String(required=True, description='Email do usuário'),
-    'telefone': fields.String(required=True, description='Telefone do usuário'),
-    'senha': fields.String(required=True, description='Senha do usuário')
+    'telefone': fields.String(required=True, description='Telefone do usuário')
 })
 
 # Recurso para criar usuário
