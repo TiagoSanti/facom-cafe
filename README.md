@@ -1,10 +1,18 @@
 # [Facom Café](https://github.com/TiagoSanti/facom-cafe)
 
+## Trabalho LBD
+
 **Grupo 4**
 
 Lourdes Oshiro Igarashi - 2021.1906.032-8
 
 Ryan Breda Santos - 2021.1906.005-0
+
+Tiago Clarintino Santi - 2021.1906.036-0
+
+## Trabalho TADS
+
+Lourdes Oshiro Igarashi - 2021.1906.032-8
 
 Tiago Clarintino Santi - 2021.1906.036-0
 
