@@ -25,6 +25,7 @@ class UsuarioCriar(Resource):
 @usuario_ns.route('/listar')
 class UsuarioListar(Resource):
     @usuario_ns.doc('listar_usuarios')
+    @usuario_ns.response(200, 'Usuários listados com sucesso.')
     def get(self):
         usuarios = listar_usuarios()
         return [usuario.to_dict() for usuario in usuarios], 200
@@ -34,6 +35,7 @@ class UsuarioListar(Resource):
 @usuario_ns.param('id', 'Identificador único do usuário')
 class UsuarioLocalizar(Resource):
     @usuario_ns.doc('localizar_usuario')
+    @usuario_ns.response(200, 'Usuário localizado com sucesso.')
     def get(self, id):
         usuario = localizar_usuario(id)
         return usuario.to_dict(), 200

@@ -8,7 +8,7 @@ pedido_ns = Namespace('pedidos', description='Operações relacionadas a pedidos
 pedido_model = pedido_ns.model('Pedido', {
     'id_usuario': fields.Integer(required=True, description='ID do usuário'),
     'data': fields.DateTime(required=True, description='Data do pedido'),
-    'status': fields.String(required=True, description='Status do pedido (concluido, cancelado, pendente)')
+    'status': fields.String(required=True, description='Status do pedido', enum=['concluido', 'cancelado', 'pendente'])
 })
 
 # Recurso para criar pedido
@@ -25,6 +25,7 @@ class PedidoCriar(Resource):
 @pedido_ns.route('/listar')
 class PedidoListar(Resource):
     @pedido_ns.doc('listar_pedidos')
+    @pedido_ns.response(200, 'Pedidos listados com sucesso.')
     def get(self):
         pedidos = listar_pedidos()
         return [pedido.to_dict() for pedido in pedidos], 200
@@ -34,6 +35,7 @@ class PedidoListar(Resource):
 @pedido_ns.param('id', 'Identificador único do pedido')
 class PedidoLocalizar(Resource):
     @pedido_ns.doc('localizar_pedido')
+    @pedido_ns.response(200, 'Pedido localizado com sucesso.')
     def get(self, id):
         pedido = localizar_pedido(id)
         return pedido.to_dict(), 200
@@ -43,6 +45,7 @@ class PedidoLocalizar(Resource):
 @pedido_ns.param('id_usuario', 'Identificador único do usuário')
 class PedidoListarUsuario(Resource):
     @pedido_ns.doc('listar_pedidos_usuario')
+    @pedido_ns.response(200, 'Pedidos do usuário listados com sucesso.')
     def get(self, id_usuario):
         pedidos = listar_pedidos_usuario(id_usuario)
         return [pedido.to_dict() for pedido in pedidos], 200

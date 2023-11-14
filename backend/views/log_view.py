@@ -18,6 +18,7 @@ log_model = log_ns.model('Log', {
 @log_ns.route('/listar')
 class LogListar(Resource):
     @log_ns.doc('listar_logs')
+    @log_ns.response(200, 'Logs listados com sucesso.')
     def get(self):
         logs = listar_logs()
         return [log.to_dict() for log in logs], 200
@@ -27,6 +28,7 @@ class LogListar(Resource):
 @log_ns.param('id', 'Identificador único do log')
 class LogLocalizar(Resource):
     @log_ns.doc('localizar_log')
+    @log_ns.response(200, 'Log localizado com sucesso.')
     def get(self, id):
         log = localizar_log(id)
         return log.to_dict(), 200
@@ -36,6 +38,7 @@ class LogLocalizar(Resource):
 @log_ns.param('tabela', 'Nome da tabela')
 class LogListarPorTabela(Resource):
     @log_ns.doc('listar_logs_por_tabela')
+    @log_ns.response(200, 'Logs listados com sucesso.')
     def get(self, tabela):
         logs = listar_logs_por_tabela(tabela)
         return [log.to_dict() for log in logs], 200
@@ -45,6 +48,7 @@ class LogListarPorTabela(Resource):
 @log_ns.param('modificacao', 'Tipo de modificação')
 class LogListarPorModificacao(Resource):
     @log_ns.doc('listar_logs_por_modificacao')
+    @log_ns.response(200, 'Logs listados com sucesso.')
     def get(self, modificacao):
         logs = listar_logs_por_modificacao(modificacao)
         return [log.to_dict() for log in logs], 200
@@ -55,6 +59,7 @@ class LogListarPorModificacao(Resource):
 @log_ns.param('data_fim', 'Data de fim')
 class LogListarPorIntervaloData(Resource):
     @log_ns.doc('listar_logs_por_intervalo_data')
+    @log_ns.response(200, 'Logs listados com sucesso.')
     def get(self, data_inicio, data_fim):
         logs = listar_logs_por_intervalo_data(data_inicio, data_fim)
         return [log.to_dict() for log in logs], 200

@@ -26,6 +26,7 @@ class PlanoCriar(Resource):
 @plano_ns.route('/listar')
 class PlanoListar(Resource):
     @plano_ns.doc('listar_planos')
+    @plano_ns.response(200, 'Planos listados com sucesso.')
     def get(self):
         planos = listar_planos()
         return [plano.to_dict() for plano in planos], 200
@@ -35,6 +36,7 @@ class PlanoListar(Resource):
 @plano_ns.param('id', 'Identificador único do plano')
 class PlanoLocalizar(Resource):
     @plano_ns.doc('localizar_plano')
+    @plano_ns.response(200, 'Plano localizado com sucesso.')
     def get(self, id):
         plano = localizar_plano(id)
         return plano.to_dict(), 200

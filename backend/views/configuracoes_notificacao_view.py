@@ -9,7 +9,7 @@ configuracoes_notificacao_model = configuracoes_notificacao_ns.model('Configurac
     'id_usuario': fields.Integer(required=True, description='ID do usuário'),
     'receber_email': fields.Boolean(required=True, description='Receber notificações por e-mail'),
     'receber_sms': fields.Boolean(required=True, description='Receber notificações por SMS'),
-    'frequencia': fields.String(required=True, description='Frequência das notificações')
+    'frequencia': fields.String(required=True, description='Frequência das notificações', enum=['diário', 'semanal', 'mensal'])
 })
 
 # Recurso para criar configuracoes_notificacao
@@ -26,6 +26,7 @@ class ConfiguracoesNotificacaoCriar(Resource):
 @configuracoes_notificacao_ns.route('/listar')
 class ConfiguracoesNotificacaoListar(Resource):
     @configuracoes_notificacao_ns.doc('listar_configuracoes_notificacoes')
+    @configuracoes_notificacao_ns.response(200, 'ConfiguracoesNotificacoes listados com sucesso.')
     def get(self):
         configuracoes_notificacoes = listar_configuracoes_notificacoes()
         return [configuracoes_notificacao.to_dict() for configuracoes_notificacao in configuracoes_notificacoes], 200
@@ -35,6 +36,7 @@ class ConfiguracoesNotificacaoListar(Resource):
 @configuracoes_notificacao_ns.param('id', 'Identificador único da configuração de notificação')
 class ConfiguracoesNotificacaoLocalizar(Resource):
     @configuracoes_notificacao_ns.doc('localizar_configuracoes_notificacao')
+    @configuracoes_notificacao_ns.response(200, 'ConfiguracoesNotificacao localizado com sucesso.')
     def get(self, id):
         configuracoes_notificacao = localizar_configuracoes_notificacao(id)
         return configuracoes_notificacao.to_dict(), 200
@@ -44,6 +46,7 @@ class ConfiguracoesNotificacaoLocalizar(Resource):
 @configuracoes_notificacao_ns.param('id_usuario', 'Identificador único do usuário')
 class ConfiguracoesNotificacaoLocalizarPorUsuario(Resource):
     @configuracoes_notificacao_ns.doc('localizar_configuracoes_notificacao_por_usuario')
+    @configuracoes_notificacao_ns.response(200, 'ConfiguracoesNotificacao localizado com sucesso.')
     def get(self, id_usuario):
         configuracoes_notificacao = localizar_configuracoes_notificacao_por_usuario(id_usuario)
         return configuracoes_notificacao.to_dict(), 200

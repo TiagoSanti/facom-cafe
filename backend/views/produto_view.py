@@ -26,6 +26,7 @@ class ProdutoCriar(Resource):
 @produto_ns.route('/listar')
 class ProdutoListar(Resource):
     @produto_ns.doc('listar_produtos')
+    @produto_ns.response(200, 'Produtos listados com sucesso.')
     def get(self):
         produtos = listar_produtos()
         return [produto.to_dict() for produto in produtos], 200
@@ -35,6 +36,7 @@ class ProdutoListar(Resource):
 @produto_ns.param('id', 'Identificador único do produto')
 class ProdutoLocalizar(Resource):
     @produto_ns.doc('localizar_produto')
+    @produto_ns.response(200, 'Produto localizado com sucesso.')
     def get(self, id):
         produto = localizar_produto(id)
         return produto.to_dict(), 200

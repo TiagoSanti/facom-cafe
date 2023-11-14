@@ -26,6 +26,7 @@ class PedidoProdutoCriar(Resource):
 @pedido_produto_ns.route('/listar')
 class PedidoProdutoListar(Resource):
     @pedido_produto_ns.doc('listar_pedidos_produtos')
+    @pedido_produto_ns.response(200, 'PedidosProdutos listados com sucesso.')
     def get(self):
         pedidos_produtos = listar_pedidos_produtos()
         return [pedido_produto.to_dict() for pedido_produto in pedidos_produtos], 200
@@ -36,6 +37,7 @@ class PedidoProdutoListar(Resource):
 @pedido_produto_ns.param('id_produto', 'Identificador único do produto')
 class PedidoProdutoLocalizar(Resource):
     @pedido_produto_ns.doc('localizar_pedido_produto')
+    @pedido_produto_ns.response(200, 'PedidoProduto localizado com sucesso.')
     def get(self, id_pedido, id_produto):
         pedido_produto = localizar_pedido_produto(id_pedido, id_produto)
         return pedido_produto.to_dict(), 200

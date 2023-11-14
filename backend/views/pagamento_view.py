@@ -10,7 +10,7 @@ pagamento_model = pagamento_ns.model('Pagamento', {
     'id_plano': fields.Integer(required=True, description='ID do plano'),
     'data': fields.Date(required=True, description='Data do pagamento'),
     'valor': fields.Float(required=True, description='Valor do pagamento'),
-    'metodo': fields.String(required=True, description='Método de pagamento')
+    'metodo': fields.String(required=True, description='Método de pagamento', enum=['pix', 'crédito', 'débito'])
 })
 
 # Recurso para criar pagamento
@@ -27,6 +27,7 @@ class PagamentoCriar(Resource):
 @pagamento_ns.route('/listar')
 class PagamentoListar(Resource):
     @pagamento_ns.doc('listar_pagamentos')
+    @pagamento_ns.response(200, 'Pagamentos listados com sucesso.')
     def get(self):
         pagamentos = listar_pagamentos()
         return [pagamento.to_dict() for pagamento in pagamentos], 200
@@ -36,6 +37,7 @@ class PagamentoListar(Resource):
 @pagamento_ns.param('id', 'Identificador único do pagamento')
 class PagamentoLocalizar(Resource):
     @pagamento_ns.doc('localizar_pagamento')
+    @pagamento_ns.response(200, 'Pagamento localizado com sucesso.')
     def get(self, id):
         pagamento = localizar_pagamento(id)
         return pagamento.to_dict(), 200
@@ -66,6 +68,7 @@ class PagamentoAtualizar(Resource):
 @pagamento_ns.param('id_usuario', 'Identificador único do usuário')
 class PagamentoListarPorUsuario(Resource):
     @pagamento_ns.doc('listar_pagamentos_por_usuario')
+    @pagamento_ns.response(200, 'Pagamentos listados com sucesso.')
     def get(self, id_usuario):
         pagamentos = listar_pagamentos_por_usuario(id_usuario)
         return [pagamento.to_dict() for pagamento in pagamentos], 200
@@ -76,6 +79,7 @@ class PagamentoListarPorUsuario(Resource):
 @pagamento_ns.param('data_fim', 'Data de fim do período')
 class PagamentoListarPorPeriodo(Resource):
     @pagamento_ns.doc('listar_pagamentos_por_periodo')
+    @pagamento_ns.response(200, 'Pagamentos listados com sucesso.')
     def get(self, data_inicio, data_fim):
         pagamentos = listar_pagamentos_por_periodo(data_inicio, data_fim)
         return [pagamento.to_dict() for pagamento in pagamentos], 200
@@ -87,6 +91,7 @@ class PagamentoListarPorPeriodo(Resource):
 @pagamento_ns.param('data_fim', 'Data de fim do período')
 class PagamentoListarPorPeriodoUsuario(Resource):
     @pagamento_ns.doc('listar_pagamentos_por_periodo_usuario')
+    @pagamento_ns.response(200, 'Pagamentos listados com sucesso.')
     def get(self, id_usuario, data_inicio, data_fim):
         pagamentos = listar_pagamentos_por_periodo_usuario(id_usuario, data_inicio, data_fim)
         return [pagamento.to_dict() for pagamento in pagamentos], 200

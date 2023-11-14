@@ -10,7 +10,7 @@ assinatura_model = assinatura_ns.model('Assinatura', {
     'id_plano': fields.Integer(required=True, description='ID do plano'),
     'data_inicio': fields.Date(required=True, description='Data de início da assinatura'),
     'data_fim': fields.Date(required=True, description='Data de fim da assinatura'),
-    'status': fields.String(required=True, description='Status da assinatura (ativa, cancelada, suspensa)')
+    'status': fields.String(required=True, description='Status da assinatura', enum=['ativa', 'cancelada', 'suspensa'])
 })
 
 # Recurso para criar assinatura
@@ -27,6 +27,7 @@ class AssinaturaCriar(Resource):
 @assinatura_ns.route('/listar')
 class AssinaturaListar(Resource):
     @assinatura_ns.doc('listar_assinaturas')
+    @assinatura_ns.response(200, 'Assinaturas listadas com sucesso.')
     def get(self):
         assinaturas = listar_assinaturas()
         return [assinatura.to_dict() for assinatura in assinaturas], 200
@@ -36,6 +37,7 @@ class AssinaturaListar(Resource):
 @assinatura_ns.param('id', 'Identificador único da assinatura')
 class AssinaturaLocalizar(Resource):
     @assinatura_ns.doc('localizar_assinatura')
+    @assinatura_ns.response(200, 'Assinatura localizada com sucesso.')
     def get(self, id):
         assinatura = localizar_assinatura(id)
         return assinatura.to_dict(), 200
@@ -45,6 +47,7 @@ class AssinaturaLocalizar(Resource):
 @assinatura_ns.param('id', 'Identificador único da assinatura')
 class AssinaturaExcluir(Resource):
     @assinatura_ns.doc('excluir_assinatura')
+    @assinatura_ns.response(200, 'Assinatura excluída com sucesso.')
     def delete(self, id):
         excluir_assinatura(id)
         return {'mensagem': 'Assinatura excluída com sucesso'}, 200
@@ -55,6 +58,7 @@ class AssinaturaExcluir(Resource):
 class AssinaturaAtualizar(Resource):
     @assinatura_ns.expect(assinatura_model)
     @assinatura_ns.doc('atualizar_assinatura')
+    @assinatura_ns.response(200, 'Assinatura atualizada com sucesso.')
     def put(self, id):
         body = assinatura_ns.payload
         assinatura = atualizar_assinatura(id, **body)
@@ -66,6 +70,7 @@ class AssinaturaAtualizar(Resource):
 @assinatura_ns.param('data_fim', 'Data de fim da assinatura')
 class AssinaturaCancelar(Resource):
     @assinatura_ns.doc('cancelar_assinatura')
+    @assinatura_ns.response(200, 'Assinatura cancelada com sucesso.')
     def post(self, id, data_fim):
         assinatura = cancelar_assinatura(id, data_fim)
         return assinatura.to_dict(), 200
@@ -75,6 +80,7 @@ class AssinaturaCancelar(Resource):
 @assinatura_ns.param('id', 'Identificador único da assinatura')
 class AssinaturaSuspender(Resource):
     @assinatura_ns.doc('suspender_assinatura')
+    @assinatura_ns.response(200, 'Assinatura suspensa com sucesso.')
     def post(self, id):
         assinatura = suspender_assinatura(id)
         return assinatura.to_dict(), 200
@@ -84,6 +90,7 @@ class AssinaturaSuspender(Resource):
 @assinatura_ns.param('id', 'Identificador único da assinatura')
 class AssinaturaReativar(Resource):
     @assinatura_ns.doc('reativar_assinatura')
+    @assinatura_ns.response(200, 'Assinatura reativada com sucesso.')
     def post(self, id):
         assinatura = reativar_assinatura(id)
         return assinatura.to_dict(), 200
