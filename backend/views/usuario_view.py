@@ -1,5 +1,7 @@
 from flask_restx import Namespace, Resource, fields
+from flask_jwt_extended import jwt_required
 from ..services.usuario_service import *
+from ..api_setup import api
 
 # Definindo o namespace
 usuario_ns = Namespace('usuarios', description='Operações relacionadas a usuários')
@@ -14,8 +16,11 @@ usuario_model = usuario_ns.model('Usuario', {
 # Recurso para criar usuário
 @usuario_ns.route('/criar')
 class UsuarioCriar(Resource):
+    @jwt_required()
+    @usuario_ns.doc(security='Bearer Auth')
     @usuario_ns.expect(usuario_model)
     @usuario_ns.response(201, 'Usuário criado com sucesso.')
+    @usuario_ns.response(400, 'Erro de validação.')
     def post(self):
         body = usuario_ns.payload
         usuario = criar_usuario(**body)
