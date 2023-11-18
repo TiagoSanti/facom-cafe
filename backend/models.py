@@ -35,9 +35,14 @@ class Plano(db.Model):
 
 class Assinatura(db.Model):
     __tablename__ = 'assinatura'
+    __table_args__ = (CheckConstraint("status IN ('ativa', 'cancelada', 'suspensa')"), {})
+    __table_args__ = (CheckConstraint("duracao IN ('1 mês', '3 meses', '6 meses', '12 meses')"), {})
+
+    # Atributos
     id = db.Column(db.Integer, primary_key=True)
     id_usuario = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
     id_plano = db.Column(db.Integer, db.ForeignKey('plano.id'), nullable=False)
+    duracao = db.Column(db.String(10), nullable=False)
     data_de_inicio = db.Column(db.Date, nullable=False)
     data_de_termino = db.Column(db.Date, nullable=True)
     status = db.Column(db.String(9), nullable=False) # ativa, cancelada, suspensa
@@ -71,77 +76,39 @@ class Pagamento(db.Model):
             'metodo': self.metodo,
         }
     
-class Pedido(db.Model):
-    __tablename__ = 'pedido'
-    id = db.Column(db.Integer, primary_key=True)
-    id_usuario = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
-    data = db.Column(db.DateTime, nullable=False)
-    status = db.Column(db.String(50), nullable=False) # concluido, cancelado, pendente
+class Plano(db.Model):
+    __tablename__ = 'plano'
 
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'id_usuario': self.id_usuario,
-            'data': self.data.isoformat(),
-            'status': self.status,
-        }
-
-class Produto(db.Model):
-    __tablename__ = 'produto'
+    # Atributos
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(255), nullable=False)
-    preco = db.Column(db.Numeric, nullable=False)
-    qtd_estoque = db.Column(db.Integer, nullable=False)
     descricao = db.Column(db.Text, nullable=True)
+    preco = db.Column(db.Numeric, nullable=False)
+
+    # Relacionamentos
+    assinaturas = db.relationship('Assinatura', back_populates='plano')
 
     def to_dict(self):
         return {
             'id': self.id,
             'nome': self.nome,
-            'preco': float(self.preco),
-            'qtd_estoque': self.qtd_estoque,
             'descricao': self.descricao,
+            'preco': float(self.preco),
+            'duracao': self.duracao,
         }
 
-class PedidoProduto(db.Model):
-    __tablename__ = 'pedidoproduto'
-    id_pedido = db.Column(db.Integer, db.ForeignKey('pedido.id'), primary_key=True)
-    id_produto = db.Column(db.Integer, db.ForeignKey('produto.id'), primary_key=True)
-    quantidade = db.Column(db.Integer, nullable=False)
-    valor = db.Column(db.Numeric, nullable=False)
+class Usuario(db.Model):
+    __tablename__ = 'usuario'
 
-    def to_dict(self):
-        return {
-            'id_pedido': self.id_pedido,
-            'id_produto': self.id_produto,
-            'quantidade': self.quantidade,
-            'valor': float(self.valor),
-        }
-
-class ConfiguracoesNotificacao(db.Model):
-    __tablename__ = 'configuracoesnotificacao'
+    # Atributos
     id = db.Column(db.Integer, primary_key=True)
-    id_usuario = db.Column(db.Integer, db.ForeignKey('usuario.id'), unique=True, nullable=False)
-    receber_email = db.Column(db.Boolean, nullable=False)
-    receber_sms = db.Column(db.Boolean, nullable=False)
-    frequencia = db.Column(db.String(7), nullable=False)
+    nome = db.Column(db.String(255), nullable=False)
+    email = db.Column(db.String(255), unique=True, nullable=False)
+    telefone = db.Column(db.String(15), unique=True, nullable=False)
 
-    def to_dict(self):
-        return {
-            'id': self.id,
-            'id_usuario': self.id_usuario,
-            'receber_email': self.receber_email,
-            'receber_sms': self.receber_sms,
-            'frequencia': self.frequencia,
-        }
-
-class Log(db.Model):
-    __tablename__ = 'log'
-    id = db.Column(db.Integer, primary_key=True)
-    tabela_modificada = db.Column(db.String(255), nullable=False)
-    id_registro_modificado = db.Column(db.Integer, nullable=False)
-    operacao = db.Column(db.String(50), nullable=False)
-    data_hora_operacao = db.Column(db.DateTime, nullable=False)
+    # Relacionamentos
+    assinaturas = db.relationship('Assinatura', back_populates='usuario')
+    pagamentos = db.relationship('Pagamento', back_populates='usuario')
 
     def to_dict(self):
         return {
