@@ -1,89 +1,149 @@
+from flask import request
 from flask_restx import Namespace, Resource, fields
-from ..services.assinatura_service import *
+from ..services.assinatura_service import (
+    criar_assinatura, listar_assinaturas, localizar_assinatura,
+    excluir_assinatura, atualizar_assinatura, cancelar_assinatura,
+    suspender_assinatura, reativar_assinatura
+)
+from ..models import Assinatura
 
 # Definindo o namespace
 assinatura_ns = Namespace('assinaturas', description='Operações relacionadas a assinaturas')
 
 # Modelo para documentação da API
-assinatura_model = assinatura_ns.model('Assinatura', {
+assinatura_create_model = assinatura_ns.model('AssinaturaCreate', {
     'id_usuario': fields.Integer(required=True, description='ID do usuário'),
     'id_plano': fields.Integer(required=True, description='ID do plano'),
-    'data_inicio': fields.Date(required=True, description='Data de início da assinatura'),
-    'data_fim': fields.Date(required=True, description='Data de fim da assinatura'),
-    'status': fields.String(required=True, description='Status da assinatura (ativa, cancelada, suspensa)')
+    'duracao': fields.String(required=True, description='Duração da assinatura (mensal, trimestral, semestral, anual)')
+})
+
+assinatura_full_model = assinatura_ns.inherit('AssinaturaFull', assinatura_create_model, {
+    'data_de_inicio': fields.Date(description='Data de início da assinatura'),
+    'data_de_termino': fields.Date(description='Data de término da assinatura'),
+    'data_de_cancelamento': fields.Date(description='Data de cancelamento da assinatura'),
+    'data_de_suspensao': fields.Date(description='Data de suspensão da assinatura'),
+    'status': fields.String(description='Status da assinatura (ativa, inativa, cancelada, suspensa)')
 })
 
 # Recurso para criar assinatura
-@assinatura_ns.route('/criar')
+@assinatura_ns.route('/')
 class AssinaturaCriar(Resource):
-    @assinatura_ns.expect(assinatura_model)
-    @assinatura_ns.response(201, 'Assinatura criada com sucesso.')
+    @assinatura_ns.expect(assinatura_create_model, validate=True)
+    @assinatura_ns.doc('criar_assinatura',
+        responses={
+            201: 'Assinatura criada com sucesso.',
+            400: 'Requisição inválida.'
+        }
+    )
     def post(self):
-        body = assinatura_ns.payload
-        assinatura = criar_assinatura(**body)
-        return assinatura.to_dict(), 201
+        dados = request.json
+        res = criar_assinatura(**dados)
 
-# Recurso para listar assinaturas
-@assinatura_ns.route('/listar')
-class AssinaturaListar(Resource):
-    @assinatura_ns.doc('listar_assinaturas')
+        if isinstance(res, Assinatura):
+            return {'mensagem': 'Assinatura criada com sucesso',
+                    'assinatura': res.to_dict()}, 201
+        else:
+            assinatura_ns.abort(400, res)
+
+    @assinatura_ns.doc('listar_assinaturas',
+        responses={
+            200: 'Assinaturas listadas com sucesso.'
+        }
+    )
     def get(self):
         assinaturas = listar_assinaturas()
-        return [assinatura.to_dict() for assinatura in assinaturas], 200
+        return {'assinaturas': [assinatura.to_dict() for assinatura in assinaturas]}, 200
 
-# Recurso para localizar assinatura por ID
-@assinatura_ns.route('/localizar/<int:id>')
+# Recurso para listar, localizar, atualizar e excluir assinaturas por ID
+@assinatura_ns.route('/<int:id>')
 @assinatura_ns.param('id', 'Identificador único da assinatura')
-class AssinaturaLocalizar(Resource):
-    @assinatura_ns.doc('localizar_assinatura')
+class AssinaturaResource(Resource):
+    @assinatura_ns.doc('localizar_assinatura',
+        responses={
+            200: 'Assinatura encontrada com sucesso.',
+            404: 'Assinatura não encontrada.'
+        }
+    )
     def get(self, id):
         assinatura = localizar_assinatura(id)
-        return assinatura.to_dict(), 200
+        if assinatura:
+            return {'assinatura': assinatura.to_dict()}, 200
+        assinatura_ns.abort(404, 'Assinatura não encontrada')
 
-# Recurso para excluir assinatura
-@assinatura_ns.route('/excluir/<int:id>')
-@assinatura_ns.param('id', 'Identificador único da assinatura')
-class AssinaturaExcluir(Resource):
-    @assinatura_ns.doc('excluir_assinatura')
-    def delete(self, id):
-        excluir_assinatura(id)
-        return {'mensagem': 'Assinatura excluída com sucesso'}, 200
-
-# Recurso para atualizar assinatura
-@assinatura_ns.route('/atualizar/<int:id>')
-@assinatura_ns.param('id', 'Identificador único da assinatura')
-class AssinaturaAtualizar(Resource):
-    @assinatura_ns.expect(assinatura_model)
-    @assinatura_ns.doc('atualizar_assinatura')
+    @assinatura_ns.expect(assinatura_full_model, validate=True)
+    @assinatura_ns.doc('atualizar_assinatura',
+        responses={
+            200: 'Assinatura atualizada com sucesso.',
+            400: 'Requisição inválida.',
+            404: 'Assinatura não encontrada.'
+        }
+    )
     def put(self, id):
-        body = assinatura_ns.payload
-        assinatura = atualizar_assinatura(id, **body)
-        return assinatura.to_dict(), 200
+        dados = request.json
+        res = atualizar_assinatura(id, **dados)
 
-# Recurso para cancelar assinatura
-@assinatura_ns.route('/cancelar/<int:id>')
+        if isinstance(res, Assinatura):
+            return {'mensagem': 'Assinatura atualizada com sucesso',
+                    'assinatura': res.to_dict()}, 200
+        else:
+            assinatura_ns.abort(400, res)
+
+    @assinatura_ns.doc('excluir_assinatura',
+        responses={
+            200: 'Assinatura excluída com sucesso.',
+            404: 'Assinatura não encontrada.'
+        }
+    )
+    def delete(self, id):
+        res = excluir_assinatura(id)
+        if isinstance(res, Assinatura):
+            return {'mensagem': 'Assinatura excluída com sucesso'}, 200
+        assinatura_ns.abort(404, 'Assinatura não encontrada')
+
+@assinatura_ns.route('/<int:id>/cancelar')
 @assinatura_ns.param('id', 'Identificador único da assinatura')
-@assinatura_ns.param('data_fim', 'Data de fim da assinatura')
 class AssinaturaCancelar(Resource):
-    @assinatura_ns.doc('cancelar_assinatura')
-    def post(self, id, data_fim):
-        assinatura = cancelar_assinatura(id, data_fim)
-        return assinatura.to_dict(), 200
+    @assinatura_ns.doc('cancelar_assinatura',
+        responses={
+            200: 'Assinatura cancelada com sucesso.',
+            400: 'Requisição inválida.'
+        }
+    )
+    def post(self, id):
+        res = cancelar_assinatura(id)
+        if isinstance(res, Assinatura):
+            return {'mensagem': 'Assinatura cancelada com sucesso',
+                    'assinatura': res.to_dict()}, 200
+        assinatura_ns.abort(400, res)
 
-# Recurso para suspender assinatura
-@assinatura_ns.route('/suspender/<int:id>')
+@assinatura_ns.route('/<int:id>/suspender')
 @assinatura_ns.param('id', 'Identificador único da assinatura')
 class AssinaturaSuspender(Resource):
-    @assinatura_ns.doc('suspender_assinatura')
+    @assinatura_ns.doc('suspender_assinatura',
+        responses={
+            200: 'Assinatura suspensa com sucesso.',
+            400: 'Requisição inválida. Pode ocorrer se a assinatura não estiver ativa ou inativa'
+        }
+    )
     def post(self, id):
-        assinatura = suspender_assinatura(id)
-        return assinatura.to_dict(), 200
+        res = suspender_assinatura(id)
+        if isinstance(res, Assinatura):
+            return {'mensagem': 'Assinatura suspensa com sucesso',
+                    'assinatura': res.to_dict()}, 200
+        assinatura_ns.abort(400, res)
 
-# Recurso para reativar assinatura
-@assinatura_ns.route('/reativar/<int:id>')
+@assinatura_ns.route('/<int:id>/reativar')
 @assinatura_ns.param('id', 'Identificador único da assinatura')
 class AssinaturaReativar(Resource):
-    @assinatura_ns.doc('reativar_assinatura')
+    @assinatura_ns.doc('reativar_assinatura',
+        responses={
+            200: 'Assinatura reativada com sucesso.',
+            400: 'Requisição inválida. Pode ocorrer se a assinatura não estiver suspensa ou inativa'
+        }
+    )
     def post(self, id):
-        assinatura = reativar_assinatura(id)
-        return assinatura.to_dict(), 200
+        res = reativar_assinatura(id)
+        if isinstance(res, Assinatura):
+            return {'mensagem': 'Assinatura reativada com sucesso',
+                    'assinatura': res.to_dict()}, 200
+        assinatura_ns.abort(400, res)

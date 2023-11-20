@@ -1,5 +1,7 @@
+from flask import request
 from flask_restx import Namespace, Resource, fields
 from ..services.plano_service import *
+from ..models import Plano
 
 # Definindo o namespace
 plano_ns = Namespace('planos', description='Operações relacionadas a planos')
@@ -9,53 +11,98 @@ plano_model = plano_ns.model('Plano', {
     'nome': fields.String(required=True, description='Nome do plano'),
     'descricao': fields.String(required=True, description='Descrição do plano'),
     'preco': fields.Float(required=True, description='Preço do plano'),
-    'duracao': fields.Integer(required=True, description='Duração do plano')
 })
 
-# Recurso para criar plano
-@plano_ns.route('/criar')
-class PlanoCriar(Resource):
-    @plano_ns.expect(plano_model)
-    @plano_ns.response(201, 'Plano criado com sucesso.')
+# Recurso para criar e listar planos
+@plano_ns.route('/')
+class PlanoCriarListar(Resource):
+    @plano_ns.expect(plano_model, validate=True)
+    @plano_ns.doc('criar_plano',
+        description='Cria um novo plano com nome, descrição e preço.',
+        responses={
+            201: 'Plano criado com sucesso.',
+            400: 'Requisição inválida. Pode ocorrer se o nome já estiver em uso.'
+        }
+    )
     def post(self):
-        body = plano_ns.payload
-        plano = criar_plano(**body)
-        return plano.to_dict(), 201
-    
-# Recurso para listar planos
-@plano_ns.route('/listar')
-class PlanoListar(Resource):
-    @plano_ns.doc('listar_planos')
+        dados = request.json
+        res = criar_plano(**dados)
+
+        if isinstance(res, Plano):
+            return {'mensagem': 'Plano criado com sucesso',
+                    'plano': res.to_dict()}, 201
+        else:
+            plano_ns.abort(400, res)
+
+    @plano_ns.doc('listar_planos',
+        description='Lista todos os planos cadastrados.',
+        responses={
+            200: 'Planos listados com sucesso.'
+        }
+    )
     def get(self):
         planos = listar_planos()
-        return [plano.to_dict() for plano in planos], 200
-    
-# Recurso para localizar plano por ID
-@plano_ns.route('/localizar/<int:id>')
-@plano_ns.param('id', 'Identificador único do plano')
-class PlanoLocalizar(Resource):
-    @plano_ns.doc('localizar_plano')
-    def get(self, id):
-        plano = localizar_plano(id)
-        return plano.to_dict(), 200
-    
-# Recurso para excluir plano
-@plano_ns.route('/excluir/<int:id>')
-@plano_ns.param('id', 'Identificador único do plano')
-class PlanoExcluir(Resource):
-    @plano_ns.doc('excluir_plano')
-    @plano_ns.response(200, 'Plano excluído com sucesso.')
-    def delete(self, id):
-        excluir_plano(id)
-        return {'mensagem': 'Plano excluído com sucesso'}, 200
+        return {'planos': [plano.to_dict() for plano in planos]}, 200
 
-# Recurso para atualizar plano
-@plano_ns.route('/atualizar/<int:id>')
+# Recurso para localizar, atualizar e excluir plano por ID
+@plano_ns.route('/<int:id>')
 @plano_ns.param('id', 'Identificador único do plano')
-class PlanoAtualizar(Resource):
-    @plano_ns.expect(plano_model)
-    @plano_ns.response(200, 'Plano atualizado com sucesso.')
+class PlanoResource(Resource):
+    @plano_ns.doc('localizar_plano',
+        description='Localiza um plano pelo ID.',
+        param = {
+            'id': 'ID único representando o plano.'
+        },
+        responses={
+            200: 'Plano localizado com sucesso.',
+            404: 'Plano não encontrado.'
+        }
+    )
+    def get(self, id):
+        res = localizar_plano(id)
+
+        if res is not None:
+            return {'plano': res.to_dict()}, 200
+        else:
+            plano_ns.abort(404, 'Plano não encontrado')
+
+    @plano_ns.expect(plano_model, validate=True)
+    @plano_ns.doc('atualizar_plano',
+        description='Atualiza um plano pelo ID.',
+        param = {
+            'id': 'ID único representando o plano.'
+        },
+        responses={
+            200: 'Plano atualizado com sucesso.',
+            400: 'Requisição inválida. Pode ocorrer se o nome já estiver em uso.',
+            404: 'Plano não encontrado.'
+        }
+    )
     def put(self, id):
-        body = plano_ns.payload
-        plano = atualizar_plano(id, **body)
-        return plano.to_dict(), 200
+        dados = request.json
+        res = atualizar_plano(id, **dados)
+
+        if isinstance(res, Plano):
+            return {'mensagem': 'Plano atualizado com sucesso',
+                    'plano': res.to_dict()}, 200
+        else:
+            plano_ns.abort(400, res)
+
+    @plano_ns.doc('excluir_plano',
+        description='Exclui um plano pelo ID.',
+        params={
+            'id': 'ID único representando o plano.'
+        },
+        responses={
+            200: 'Plano excluído com sucesso.',
+            404: 'Plano não encontrado.'
+        }
+    )
+    def delete(self, id):
+        res = excluir_plano(id)
+
+        if isinstance(res, Plano):
+            return {'mensagem': 'Plano excluído com sucesso',
+                    'plano': res.to_dict()}, 200
+        else:
+            plano_ns.abort(404, 'Plano não encontrado')

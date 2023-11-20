@@ -1,5 +1,7 @@
+from flask import request
 from flask_restx import Namespace, Resource, fields
 from ..services.usuario_service import *
+from ..models import Usuario
 
 # Definindo o namespace
 usuario_ns = Namespace('usuarios', description='Operações relacionadas a usuários')
@@ -8,54 +10,97 @@ usuario_ns = Namespace('usuarios', description='Operações relacionadas a usuá
 usuario_model = usuario_ns.model('Usuario', {
     'nome': fields.String(required=True, description='Nome do usuário'),
     'email': fields.String(required=True, description='Email do usuário'),
-    'telefone': fields.String(required=True, description='Telefone do usuário'),
-    'senha': fields.String(required=True, description='Senha do usuário')
+    'telefone': fields.String(required=True, description='Telefone do usuário')
 })
 
-# Recurso para criar usuário
-@usuario_ns.route('/criar')
-class UsuarioCriar(Resource):
-    @usuario_ns.expect(usuario_model)
-    @usuario_ns.response(201, 'Usuário criado com sucesso.')
+# Recurso para criar e listar usuários
+@usuario_ns.route('/')
+class UsuarioCriarListar(Resource):
+    @usuario_ns.expect(usuario_model, validate=True)
+    @usuario_ns.doc(
+        description='Cria um novo usuário com nome, email, e telefone.',
+        responses={
+            201: 'Usuário criado com sucesso.',
+            400: 'Requisição inválida. Pode ocorrer se o email já estiver em uso.'
+        }
+    )
     def post(self):
-        body = usuario_ns.payload
-        usuario = criar_usuario(**body)
-        return usuario.to_dict(), 201
+        dados = request.json
+        res = criar_usuario(**dados)
 
-# Recurso para listar usuários
-@usuario_ns.route('/listar')
-class UsuarioListar(Resource):
-    @usuario_ns.doc('listar_usuarios')
+        if isinstance(res, Usuario):
+            return {'mensagem': 'Usuário criado com sucesso',
+                    'usuario': res.to_dict()}, 201
+        else:
+            usuario_ns.abort(400, res)
+
+    @usuario_ns.doc(
+        description='Lista todos os usuários cadastrados.',
+        responses={
+            200: 'Usuários listados com sucesso.'
+        }
+    )
     def get(self):
         usuarios = listar_usuarios()
-        return [usuario.to_dict() for usuario in usuarios], 200
+        return {'usuarios': [usuario.to_dict() for usuario in usuarios]}, 200
 
-# Recurso para localizar usuário por ID
-@usuario_ns.route('/localizar/<int:id>')
+# Recurso para localizar, atualizar e excluir usuário por ID
+@usuario_ns.route('/<int:id>')
 @usuario_ns.param('id', 'Identificador único do usuário')
-class UsuarioLocalizar(Resource):
-    @usuario_ns.doc('localizar_usuario')
+class UsuarioLocalizarAtualizarExcluir(Resource):
+    @usuario_ns.doc(
+        description='Localiza um usuário pelo ID.',
+        params={
+            'id': 'ID único representando o usuário.'
+        },
+        responses={
+            200: 'Usuário encontrado com sucesso.',
+            404: 'Usuário não encontrado.'
+        }
+    )
     def get(self, id):
         usuario = localizar_usuario(id)
-        return usuario.to_dict(), 200
+        if usuario:
+            return {'usuario': usuario.to_dict()}, 200
+        usuario_ns.abort(404, 'Usuário não encontrado')
 
-# Recurso para excluir usuário
-@usuario_ns.route('/excluir/<int:id>')
-@usuario_ns.param('id', 'Identificador único do usuário')
-class UsuarioExcluir(Resource):
-    @usuario_ns.doc('excluir_usuario')
-    @usuario_ns.response(200, 'Usuário excluído com sucesso.')
-    def delete(self, id):
-        excluir_usuario(id)
-        return {'mensagem': 'Usuário excluído com sucesso'}, 200
-
-# Recurso para atualizar usuário
-@usuario_ns.route('/atualizar/<int:id>')
-@usuario_ns.param('id', 'Identificador único do usuário')
-class UsuarioAtualizar(Resource):
-    @usuario_ns.expect(usuario_model)
-    @usuario_ns.response(200, 'Usuário atualizado com sucesso.')
+    @usuario_ns.expect(usuario_model, validate=True)
+    @usuario_ns.doc(
+        description='Atualiza um usuário pelo ID.',
+        params={
+            'id': 'ID único representando o usuário.'
+        },
+        responses={
+            200: 'Usuário atualizado com sucesso.',
+            400: 'Requisição inválida. Pode ocorrer se o email ou telefone já estiver em uso.',
+            404: 'Usuário não encontrado.'
+        }
+    )
     def put(self, id):
-        body = usuario_ns.payload
-        usuario = atualizar_usuario(id, **body)
-        return usuario.to_dict(), 200
+        dados = request.json
+        res = atualizar_usuario(id, **dados)
+
+        if isinstance(res, Usuario):
+            return {'mensagem': 'Usuário atualizado com sucesso',
+                    'usuario': res.to_dict()}, 200
+        elif isinstance(res, str) and 'válido' in res:
+            usuario_ns.abort(404, res)
+        else:
+            usuario_ns.abort(400, res)
+
+    @usuario_ns.doc(
+        description='Exclui um usuário pelo ID.',
+        params={
+            'id': 'ID único representando o usuário.'
+        },
+        responses={
+            200: 'Usuário excluído com sucesso.',
+            404: 'Usuário não encontrado.'
+        }
+    )
+    def delete(self, id):
+        res = excluir_usuario(id)
+        if isinstance(res, Usuario):
+            return {'mensagem': 'Usuário excluído com sucesso',
+                    'usuario': res.to_dict()}, 200
+        usuario_ns.abort(404, 'Usuário não encontrado')
