@@ -5,7 +5,7 @@ authorizations = {
         'type': 'apiKey',
         'in': 'header',
         'name': 'Authorization',
-        'description': 'Digite \'Bearer <token>\' no campo abaixo.'
+        'description': 'Digite \'Bearer <<token>>\' no campo abaixo.'
     },
 }
 
