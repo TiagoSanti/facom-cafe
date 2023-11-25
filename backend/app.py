@@ -5,6 +5,7 @@ from .models import db
 from .api_setup import api
 
 from .views.assinatura_view import assinatura_ns
+from .views.auth_view import auth_ns
 from .views.pagamento_view import pagamento_ns
 from .views.plano_view import plano_ns
 from .views.usuario_view import usuario_ns
@@ -24,6 +25,7 @@ def create_app():
     api.init_app(app)
 
     api.add_namespace(assinatura_ns)
+    api.add_namespace(auth_ns)
     api.add_namespace(pagamento_ns)
     api.add_namespace(plano_ns)
     api.add_namespace(usuario_ns)

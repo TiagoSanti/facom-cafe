@@ -1,7 +1,9 @@
+import re
 from flask import request
 from flask_restx import Namespace, Resource, fields
 from ..services.usuario_service import *
 from ..models import Usuario
+from ..middleware import requer_token
 
 # Definindo o namespace
 usuario_ns = Namespace('usuarios', description='Operações relacionadas a usuários')
@@ -34,11 +36,13 @@ class UsuarioCriarListar(Resource):
         else:
             usuario_ns.abort(400, res)
 
+    @requer_token
     @usuario_ns.doc(
         description='Lista todos os usuários cadastrados.',
         responses={
             200: 'Usuários listados com sucesso.'
-        }
+        },
+        security='Bearer Token'
     )
     def get(self):
         usuarios = listar_usuarios()
