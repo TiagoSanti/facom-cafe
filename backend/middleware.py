@@ -24,7 +24,7 @@ def requer_token(f):
         token = request.headers.get('Authorization')
 
         if not token:
-            return {"mensagem": "Token é necessário"}, 401
+            return {'mensagem': 'Token é necessário'}, 401
 
         token_valido, user_info = validar_token_com_keycloak(token)
         
