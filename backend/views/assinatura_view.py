@@ -1,11 +1,8 @@
 from flask import request
 from flask_restx import Namespace, Resource, fields
-from ..services.assinatura_service import (
-    criar_assinatura, listar_assinaturas, localizar_assinatura,
-    excluir_assinatura, atualizar_assinatura, cancelar_assinatura,
-    suspender_assinatura, reativar_assinatura
-)
+from ..services.assinatura_service import *
 from ..models import Assinatura
+from ..middleware import requer_token
 
 # Definindo o namespace
 assinatura_ns = Namespace('assinaturas', description='Operações relacionadas a assinaturas')
@@ -45,6 +42,7 @@ class AssinaturaCriar(Resource):
         else:
             assinatura_ns.abort(400, res)
 
+    @requer_token
     @assinatura_ns.doc('listar_assinaturas',
         responses={
             200: 'Assinaturas listadas com sucesso.'
