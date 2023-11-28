@@ -2,9 +2,8 @@ from functools import wraps
 import os
 from flask import request
 import requests
-from requests.exceptions import JSONDecodeError
 
-AUTH_EMAIL = os.getenv('AUTH_EMAIL')
+TOKEN_SUB = os.getenv('TOKEN_SUB')
 
 def validar_token_com_keycloak(token):
     url = 'https://auth.facoffee.hsborges.dev/realms/facoffee/protocol/openid-connect/userinfo'
@@ -18,11 +17,13 @@ def validar_token_com_keycloak(token):
     }
 
     response = requests.request('POST', url, data=payload, headers=headers)
-
+    
+    if response.json().get('sub') != TOKEN_SUB:
+        return False, 'Sub inválido'
     if response.status_code == 200:
         return True, response.json()
     elif response.status_code == 401:
-        return False, None
+        return False, 'Token inválido ou expirado'
 
 def requer_token(f):
     @wraps(f)
@@ -32,13 +33,10 @@ def requer_token(f):
         if not token:
             return {'mensagem': 'Token é necessário'}, 401
 
-        token_valido, user_info = validar_token_com_keycloak(token)
+        token_valido, conteudo = validar_token_com_keycloak(token)
         
         if not token_valido:
-            return {'mensagem': 'Token inválido ou expirado.'}, 401
-        
-        if user_info['email'] != AUTH_EMAIL:
-            return {'mensagem': 'Dados inválidos.'}, 401
+            return {'mensagem': conteudo}, 401
         
         return f(*args, **kwargs)
     

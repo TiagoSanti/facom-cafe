@@ -10,13 +10,13 @@ def obter_token_keycloak(email):
     if localizar_usuario_por_email(email) is None:
         return 'Usuário não existe'
 
-    url = "https://auth.facoffee.hsborges.dev/realms/facoffee/protocol/openid-connect/token"
+    url = 'https://auth.facoffee.hsborges.dev/realms/facoffee/protocol/openid-connect/token'
     data = {
-        "client_id": "facoffee",
-        "grant_type": "password",
-        "username": AUTH_EMAIL,
-        "password": AUTH_PASSWORD,
-        "scope": "openid"
+        'client_id': 'facoffee',
+        'grant_type': 'password',
+        'username': AUTH_EMAIL,
+        'password': AUTH_PASSWORD,
+        'scope': 'openid'
     }
     response = requests.post(url, data=data)
 
